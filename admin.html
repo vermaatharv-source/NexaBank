@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NexaBank | Admin Dashboard</title>
+  <link rel="stylesheet" href="admin.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="logo">N</div>
+      <span>NexaBank</span>
+    </div>
+    <div class="admin-badge">ADMIN PANEL</div>
+    <div class="admin-name" id="adminName">Welcome, Admin</div>
+
+    <nav>
+      <button class="nav-btn active" onclick="showSection('dashboard', this)">📊 Dashboard</button>
+      <button class="nav-btn" onclick="showSection('members', this)">👥 All Members</button>
+      <button class="nav-btn" onclick="showSection('addMember', this)">➕ Add Member</button>
+      <button class="nav-btn" onclick="showSection('deleteMember', this)">🗑️ Delete Member</button>
+      <button class="nav-btn" onclick="showSection('searchMember', this)">🔍 Search Member</button>
+      <button class="nav-btn" onclick="showSection('loans', this)">💰 Manage Loans</button>
+      <button class="nav-btn" onclick="showSection('report', this)">📄 Branch Report</button>
+    </nav>
+
+    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- DASHBOARD SECTION -->
+    <div id="dashboard" class="section active">
+      <h2>Dashboard Overview</h2>
+      <div class="cards">
+        <div class="card purple">
+          <p>Total Members</p>
+          <h3 id="totalMembers">0</h3>
+        </div>
+        <div class="card blue">
+          <p>Pending Loans</p>
+          <h3 id="totalLoans">0</h3>
+        </div>
+        <div class="card green">
+          <p>Total Transactions</p>
+          <h3 id="totalTxns">0</h3>
+        </div>
+        <div class="card orange">
+          <p>Total Admins</p>
+          <h3>4</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL MEMBERS SECTION -->
+    <div id="members" class="section">
+      <h2>All Member Accounts</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>ID</th>
+              <th>Balance (₹)</th>
+            </tr>
+          </thead>
+          <tbody id="membersTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADD MEMBER SECTION -->
+    <div id="addMember" class="section">
+      <h2>Add New Member</h2>
+      <div class="form-box">
+        <div class="input-group">
+          <label>Full Name</label>
+          <input type="text" id="newName" placeholder="Enter member name" />
+        </div>
+        <div class="input-group">
+          <label>Account ID</label>
+          <input type="number" id="newId" placeholder="Enter unique ID" />
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="text" id="newPassword" placeholder="Set password" />
+        </div>
+        <div class="input-group">
+          <label>Initial Balance (₹)</label>
+          <input type="number" id="newBalance" placeholder="Enter starting balance" />
+        </div>
+        <button class="btn-action" onclick="handleAddMember()">Create Account</button>
+        <p class="msg" id="addMsg"></p>
+      </div>
+    </div>
+
+    <!-- DELETE MEMBER SECTION -->
+    <div id="deleteMember" class="section">
+      <h2>Delete Member Account</h2>
+      <div class="form-box">
+        <div class="input-group">
+          <label>Member Account ID</label>
+          <input type="number" id="deleteId" placeholder="Enter ID to delete" />
+        </div>
+        <button class="btn-action danger" onclick="handleDeleteMember()">Delete Account</button>
+        <p class="msg" id="deleteMsg"></p>
+      </div>
+    </div>
+
+    <!-- SEARCH SECTION -->
+    <div id="searchMember" class="section">
+      <h2>Search Member</h2>
+      <div class="form-box">
+        <div class="tab-group">
+          <button class="tab active" onclick="switchSearch('id', this)">Search by ID</button>
+          <button class="tab" onclick="switchSearch('name', this)">Search by Name</button>
+        </div>
+        <div id="searchById">
+          <div class="input-group">
+            <label>Account ID</label>
+            <input type="number" id="searchId" placeholder="Enter account ID" />
+          </div>
+          <button class="btn-action" onclick="handleSearchById()">Search</button>
+        </div>
+        <div id="searchByName" class="hidden">
+          <div class="input-group">
+            <label>Member Name</label>
+            <input type="text" id="searchName" placeholder="Enter member name" />
+          </div>
+          <button class="btn-action" onclick="handleSearchByName()">Search</button>
+        </div>
+        <div class="result-box" id="searchResult"></div>
+      </div>
+    </div>
+
+    <!-- LOANS SECTION -->
+    <div id="loans" class="section">
+      <h2>Manage Loan Applications</h2>
+      <div id="loansList"></div>
+    </div>
+
+    <!-- REPORT SECTION -->
+    <div id="report" class="section">
+      <h2>Branch Report</h2>
+      <button class="btn-action" onclick="generateReport()">Generate Report</button>
+      <div id="reportContent" style="margin-top:20px;"></div>
+    </div>
+
+  </div>
+
+  <script src="bank.js"></script>
+  <script>
+    // ── ON PAGE LOAD ──
+    window.onload = function () {
+      const admin = getLoggedInAdmin();
+      if (!admin) { window.location.href = 'index.html'; return; }
+      document.getElementById('adminName').textContent = admin.name;
+      document.getElementById('totalMembers').textContent = getAllMembers().length;
+      document.getElementById('totalLoans').textContent = getAllLoans().length;
+      document.getElementById('totalTxns').textContent = getAllTransactions().length;
+      loadMembersTable();
+    }
+
+    // ── SECTION SWITCHING ──
+    function showSection(id, btn) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      btn.classList.add('active');
+      if (id === 'loans') loadLoans();
+    }
+
+    // ── LOAD MEMBERS TABLE ──
+    function loadMembersTable() {
+      const tbody = document.getElementById('membersTable');
+      tbody.innerHTML = '';
+      getAllMembers().forEach(m => {
+        tbody.innerHTML += `<tr>
+          <td>${m.name}</td>
+          <td>${m.id}</td>
+          <td>₹${m.balance.toLocaleString()}</td>
+        </tr>`;
+      });
+    }
+
+    // ── ADD MEMBER ──
+    function handleAddMember() {
+      const name = document.getElementById('newName').value;
+      const id = document.getElementById('newId').value;
+      const password = document.getElementById('newPassword').value;
+      const balance = document.getElementById('newBalance').value;
+      const msg = document.getElementById('addMsg');
+
+      if (!name || !id || !password || !balance) {
+        showMsg(msg, 'All fields are required!', false); return;
+      }
+      const result = createMember(name, id, password, balance);
+      if (result.success) {
+        showMsg(msg, 'Member account created successfully!', true);
+        document.getElementById('totalMembers').textContent = getAllMembers().length;
+      } else {
+        showMsg(msg, result.msg, false);
+      }
+    }
+
+    // ── DELETE MEMBER ──
+    function handleDeleteMember() {
+      const id = document.getElementById('deleteId').value;
+      const msg = document.getElementById('deleteMsg');
+      if (!id) { showMsg(msg, 'Please enter an ID!', false); return; }
+      const result = deleteMember(id);
+      if (result.success) {
+        showMsg(msg, 'Account deleted successfully!', true);
+        document.getElementById('totalMembers').textContent = getAllMembers().length;
+      } else {
+        showMsg(msg, result.msg, false);
+      }
+    }
+
+    // ── SEARCH ──
+    function switchSearch(type, btn) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('searchById').classList.add('hidden');
+      document.getElementById('searchByName').classList.add('hidden');
+      document.getElementById('search' + (type === 'id' ? 'ById' : 'ByName')).classList.remove('hidden');
+      document.getElementById('searchResult').innerHTML = '';
+    }
+
+    function handleSearchById() {
+      const id = document.getElementById('searchId').value;
+      const m = searchById(id);
+      const box = document.getElementById('searchResult');
+      if (m) {
+        box.innerHTML = `<div class="result-card">
+          <p><span>Name:</span> ${m.name}</p>
+          <p><span>ID:</span> ${m.id}</p>
+          <p><span>Balance:</span> ₹${m.balance.toLocaleString()}</p>
+        </div>`;
+      } else {
+        box.innerHTML = `<p class="error-msg">No account found with this ID.</p>`;
+      }
+    }
+
+    function handleSearchByName() {
+      const name = document.getElementById('searchName').value;
+      const m = searchByName(name);
+      const box = document.getElementById('searchResult');
+      if (m) {
+        box.innerHTML = `<div class="result-card">
+          <p><span>Name:</span> ${m.name}</p>
+          <p><span>ID:</span> ${m.id}</p>
+          <p><span>Balance:</span> ₹${m.balance.toLocaleString()}</p>
+        </div>`;
+      } else {
+        box.innerHTML = `<p class="error-msg">No account found with this name.</p>`;
+      }
+    }
+
+    // ── LOANS ──
+    function loadLoans() {
+      const loans = getAllLoans();
+      const box = document.getElementById('loansList');
+      if (loans.length === 0) {
+        box.innerHTML = '<p class="empty-msg">No pending loan applications.</p>'; return;
+      }
+      box.innerHTML = loans.map(l => `
+        <div class="loan-card">
+          <div>
+            <p class="loan-name">${l.name}</p>
+            <p class="loan-detail">ID: ${l.id} &nbsp;|&nbsp; Amount: ₹${l.amount.toLocaleString()}</p>
+          </div>
+          <div class="loan-actions">
+            <button class="btn-approve" onclick="handleApproveLoan(${l.id})">Approve</button>
+            <button class="btn-reject" onclick="handleRejectLoan(${l.id})">Reject</button>
+          </div>
+        </div>`).join('');
+    }
+
+    function handleApproveLoan(id) {
+      const result = approveLoan(id);
+      alert(result.success ? 'Loan approved! Balance updated.' : result.msg);
+      loadLoans();
+      document.getElementById('totalLoans').textContent = getAllLoans().length;
+    }
+
+    function handleRejectLoan(id) {
+      const result = rejectLoan(id);
+      alert(result.success ? 'Loan application rejected.' : result.msg);
+      loadLoans();
+      document.getElementById('totalLoans').textContent = getAllLoans().length;
+    }
+
+    // ── REPORT ──
+    function generateReport() {
+      const members = getAllMembers();
+      const loans = getAllLoans();
+      const txns = getAllTransactions();
+      let html = `<h3>Members (${members.length})</h3><div class="table-wrap"><table>
+        <thead><tr><th>Name</th><th>ID</th><th>Balance</th></tr></thead><tbody>
+        ${members.map(m => `<tr><td>${m.name}</td><td>${m.id}</td><td>₹${m.balance.toLocaleString()}</td></tr>`).join('')}
+        </tbody></table></div>
+        <h3 style="margin-top:24px;">Pending Loans (${loans.length})</h3>
+        ${loans.length === 0 ? '<p class="empty-msg">None</p>' : loans.map(l => `<div class="result-card"><p>${l.name} — ₹${l.amount.toLocaleString()}</p></div>`).join('')}
+        <h3 style="margin-top:24px;">Transactions (${txns.length})</h3>
+        ${txns.length === 0 ? '<p class="empty-msg">None</p>' : txns.map(t => `<div class="result-card"><p>${t.sender_name} → ${t.receiver_name} : ₹${t.amount.toLocaleString()}</p></div>`).join('')}`;
+      document.getElementById('reportContent').innerHTML = html;
+    }
+
+    // ── HELPERS ──
+    function showMsg(el, text, success) {
+      el.textContent = text;
+      el.style.color = success ? '#4ade80' : '#f87171';
+    }
+
+    function logout() {
+  sessionStorage.removeItem('loggedInAdmin'); // only remove login, keep data
+  window.location.href = 'front_page.html';
+    }
+  </script>
+</body>
+</html>
