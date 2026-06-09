@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NexaBank | Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+
+<body>
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="brand">
+      <div class="logo">N</div>
+      <span class="brand-name">NexaBank</span>
+    </div>
+    <div class="left-content">
+      <h1>Your money,<br/><span class="highlight">secured.</span></h1>
+      <p>A modern banking experience built for everyone. Fast, safe, and always available.</p>
+      <div class="stats">
+        <div class="stat">
+          <h3>47+</h3>
+          <p>Active Members</p>
+        </div>
+        <div class="stat">
+          <h3>100%</h3>
+          <p>Secure Transactions</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="login-box">
+      <h2>Welcome back</h2>
+      <p class="sub">Sign in to your account</p>
+
+      <!-- TAB TOGGLE -->
+      <div class="tab-group">
+        <button class="tab active" onclick="switchTab('member', this)">Member</button>
+        <button class="tab" onclick="switchTab('admin', this)">Admin</button>
+      </div>
+
+      <!-- MEMBER FORM -->
+      <div id="member-form" class="form-section">
+        <div class="input-group">
+          <label>Account ID</label>
+          <input type="number" id="memberId" placeholder="Enter your account ID" />
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="memberPassword" placeholder="Enter your password" />
+        </div>
+        <button class="btn-login" onclick="handleLogin()">Login as Member</button>
+      </div>
+
+      <!-- ADMIN FORM -->
+      <div id="admin-form" class="form-section hidden">
+        <div class="input-group">
+          <label>4-Digit Access Code</label>
+          <input type="number" id="adminCode" placeholder="Enter your 4-digit code" />
+        </div>
+        <button class="btn-login" onclick="handleLogin()">Login as Admin</button>
+      </div>
+
+      <p class="footer-note">NexaBank &copy; 2025 &mdash; All rights reserved</p>
+    </div>
+  </div>
+
+  <script src="bank.js"></script>
+  <script>
+    function switchTab(type, el) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('member-form').classList.add('hidden');
+      document.getElementById('admin-form').classList.add('hidden');
+      document.getElementById(type + '-form').classList.remove('hidden');
+    }
+
+    function handleLogin() {
+      const activeTab = document.querySelector('.tab.active').textContent.trim();
+
+      if (activeTab === 'Member') {
+        const id = document.getElementById('memberId').value;
+        const password = document.getElementById('memberPassword').value;
+
+        if (!id || !password) {
+          alert('Please enter both ID and password!');
+          return;
+        }
+
+        const result = memberLogin(id, password);
+        if (result.success) {
+          window.location.href = 'member.html'; // ✅ FIXED
+        } else {
+          alert(result.msg);
+        }
+
+      } else {
+        const id = document.getElementById('adminCode').value;
+
+        if (!id) {
+          alert('Please enter your access code!');
+          return;
+        }
+
+        const result = adminLogin(id);
+        if (result.success) {
+          window.location.href = 'admin.html';
+        } else {
+          alert(result.msg);
+        }
+      }
+    }
+  </script>
+
+</body>
+</html>

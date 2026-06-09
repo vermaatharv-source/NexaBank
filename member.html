@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NexaBank | Member Portal</title>
+  <link rel="stylesheet" href="member.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="logo">N</div>
+      <span>NexaBank</span>
+    </div>
+    <div class="member-badge">MEMBER PORTAL</div>
+    <div class="member-name" id="memberName">Welcome</div>
+
+    <nav>
+      <button class="nav-btn active" onclick="showSection('home', this)">🏠 Home</button>
+      <button class="nav-btn" onclick="showSection('deposit', this)">💵 Deposit</button>
+      <button class="nav-btn" onclick="showSection('withdraw', this)">💸 Withdraw</button>
+      <button class="nav-btn" onclick="showSection('transfer', this)">🔄 Transfer</button>
+      <button class="nav-btn" onclick="showSection('loan', this)">🏦 Apply Loan</button>
+      <button class="nav-btn" onclick="showSection('loanstatus', this)">📋 Loan Status</button>
+      <button class="nav-btn" onclick="showSection('history', this)">📜 Transactions</button>
+      <button class="nav-btn" onclick="showSection('password', this)">🔑 Change Password</button>
+    </nav>
+
+    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- HOME -->
+    <div id="home" class="section active">
+      <h2>Good day, <span id="greetName"></span> 👋</h2>
+      <div class="balance-card">
+        <p>Available Balance</p>
+        <h1 id="balanceDisplay">₹0</h1>
+        <span>Account ID: <strong id="idDisplay"></strong></span>
+      </div>
+      <div class="quick-cards">
+        <div class="quick-card" onclick="showSection('deposit', document.querySelectorAll('.nav-btn')[1])">
+          <div class="qicon green">💵</div>
+          <p>Deposit</p>
+        </div>
+        <div class="quick-card" onclick="showSection('withdraw', document.querySelectorAll('.nav-btn')[2])">
+          <div class="qicon red">💸</div>
+          <p>Withdraw</p>
+        </div>
+        <div class="quick-card" onclick="showSection('transfer', document.querySelectorAll('.nav-btn')[3])">
+          <div class="qicon blue">🔄</div>
+          <p>Transfer</p>
+        </div>
+        <div class="quick-card" onclick="showSection('loan', document.querySelectorAll('.nav-btn')[4])">
+          <div class="qicon purple">🏦</div>
+          <p>Loan</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEPOSIT -->
+    <div id="deposit" class="section">
+      <h2>Deposit Money</h2>
+      <div class="form-box">
+        <div class="input-group">
+          <label>Amount (₹)</label>
+          <input type="number" id="depositAmount" placeholder="Enter amount to deposit" />
+        </div>
+        <button class="btn-action green-btn" onclick="handleDeposit()">Deposit Money</button>
+        <p class="msg" id="depositMsg"></p>
+      </div>
+    </div>
+
+    <!-- WITHDRAW -->
+    <div id="withdraw" class="section">
+      <h2>Withdraw Money</h2>
+      <div class="form-box">
+        <div class="input-group">
+          <label>Amount (₹)</label>
+          <input type="number" id="withdrawAmount" placeholder="Enter amount to withdraw" />
+        </div>
+        <button class="btn-action red-btn" onclick="handleWithdraw()">Withdraw Money</button>
+        <p class="msg" id="withdrawMsg"></p>
+      </div>
+    </div>
+
+    <!-- TRANSFER -->
+    <div id="transfer" class="section">
+      <h2>Transfer Money</h2>
+      <div class="form-box">
+        <div class="input-group">
+          <label>Receiver Account ID</label>
+          <input type="number" id="receiverId" placeholder="Enter receiver's account ID" />
+        </div>
+        <div class="input-group">
+          <label>Amount (₹)</label>
+          <input type="number" id="transferAmount" placeholder="Enter amount to transfer" />
+        </div>
+        <button class="btn-action" onclick="handleTransfer()">Transfer Money</button>
+        <p class="msg" id="transferMsg"></p>
+      </div>
+    </div>
+
+    <!-- LOAN -->
+    <div id="loan" class="section">
+      <h2>Apply for Loan</h2>
+      <div class="form-box">
+        <div class="input-group">
+          <label>Loan Amount (₹)</label>
+          <input type="number" id="loanAmount" placeholder="Enter loan amount" />
+        </div>
+        <button class="btn-action" onclick="handleLoan()">Submit Application</button>
+        <p class="msg" id="loanMsg"></p>
+      </div>
+    </div>
+
+    <!-- LOAN STATUS -->
+    <div id="loanstatus" class="section">
+      <h2>Loan Application Status</h2>
+      <div id="loanStatusBox"></div>
+    </div>
+
+    <!-- TRANSACTION HISTORY -->
+    <div id="history" class="section">
+      <h2>Transaction History</h2>
+      <div id="historyBox"></div>
+    </div>
+
+    <!-- CHANGE PASSWORD -->
+    <div id="password" class="section">
+      <h2>Change Password</h2>
+      <div class="form-box">
+        <div class="input-group">
+          <label>Current Password</label>
+          <input type="password" id="currentPass" placeholder="Enter current password" />
+        </div>
+        <div class="input-group">
+          <label>New Password</label>
+          <input type="password" id="newPass" placeholder="Enter new password" />
+        </div>
+        <div class="input-group">
+          <label>Confirm New Password</label>
+          <input type="password" id="confirmPass" placeholder="Confirm new password" />
+        </div>
+        <button class="btn-action" onclick="handlePasswordChange()">Update Password</button>
+        <p class="msg" id="passMsg"></p>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="bank.js"></script>
+  <script>
+    // ── ON LOAD ──
+    window.onload = function () {
+      const member = getLoggedInMember();
+      if (!member) { window.location.href = 'index.html'; return; }
+      document.getElementById('memberName').textContent = member.name;
+      document.getElementById('greetName').textContent = member.name;
+      document.getElementById('balanceDisplay').textContent = '₹' + member.balance.toLocaleString();
+      document.getElementById('idDisplay').textContent = member.id;
+    }
+
+    // ── SECTION SWITCH ──
+    function showSection(id, btn) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if (btn) btn.classList.add('active');
+
+      // load dynamic content
+      if (id === 'loanstatus') loadLoanStatus();
+      if (id === 'history') loadHistory();
+    }
+
+    // ── DEPOSIT ──
+    function handleDeposit() {
+      const amount = document.getElementById('depositAmount').value;
+      const msg = document.getElementById('depositMsg');
+      if (!amount) { showMsg(msg, 'Please enter an amount!', false); return; }
+      const result = depositMoney(amount);
+      if (result.success) {
+        showMsg(msg, `₹${parseInt(amount).toLocaleString()} deposited! New balance: ₹${result.balance.toLocaleString()}`, true);
+        document.getElementById('balanceDisplay').textContent = '₹' + result.balance.toLocaleString();
+        document.getElementById('depositAmount').value = '';
+      } else {
+        showMsg(msg, result.msg, false);
+      }
+    }
+
+    // ── WITHDRAW ──
+    function handleWithdraw() {
+      const amount = document.getElementById('withdrawAmount').value;
+      const msg = document.getElementById('withdrawMsg');
+      if (!amount) { showMsg(msg, 'Please enter an amount!', false); return; }
+      const result = withdrawMoney(amount);
+      if (result.success) {
+        showMsg(msg, `₹${parseInt(amount).toLocaleString()} withdrawn! New balance: ₹${result.balance.toLocaleString()}`, true);
+        document.getElementById('balanceDisplay').textContent = '₹' + result.balance.toLocaleString();
+        document.getElementById('withdrawAmount').value = '';
+      } else {
+        showMsg(msg, result.msg, false);
+      }
+    }
+
+    // ── TRANSFER ──
+    function handleTransfer() {
+      const receiverId = document.getElementById('receiverId').value;
+      const amount = document.getElementById('transferAmount').value;
+      const msg = document.getElementById('transferMsg');
+      if (!receiverId || !amount) { showMsg(msg, 'Please fill all fields!', false); return; }
+      const result = transferMoney(receiverId, amount);
+      if (result.success) {
+        showMsg(msg, `₹${parseInt(amount).toLocaleString()} transferred to ${result.receiverName}! New balance: ₹${result.balance.toLocaleString()}`, true);
+        document.getElementById('balanceDisplay').textContent = '₹' + result.balance.toLocaleString();
+        document.getElementById('receiverId').value = '';
+        document.getElementById('transferAmount').value = '';
+      } else {
+        showMsg(msg, result.msg, false);
+      }
+    }
+
+    // ── LOAN ──
+    function handleLoan() {
+      const amount = document.getElementById('loanAmount').value;
+      const msg = document.getElementById('loanMsg');
+      if (!amount) { showMsg(msg, 'Please enter loan amount!', false); return; }
+      const result = applyLoan(amount);
+      if (result.success) {
+        showMsg(msg, 'Loan application submitted successfully! Awaiting admin approval.', true);
+        document.getElementById('loanAmount').value = '';
+      } else {
+        showMsg(msg, result.msg, false);
+      }
+    }
+
+    // ── LOAN STATUS ──
+    function loadLoanStatus() {
+      const loan = viewLoanStatus();
+      const box = document.getElementById('loanStatusBox');
+      if (loan) {
+        box.innerHTML = `
+          <div class="status-card pending">
+            <div class="status-dot"></div>
+            <div>
+              <p class="status-label">PENDING APPROVAL</p>
+              <p class="status-amount">₹${loan.amount.toLocaleString()}</p>
+              <p class="status-name">Applicant: ${loan.name}</p>
+            </div>
+          </div>`;
+      } else {
+        box.innerHTML = `<p class="empty-msg">No pending loan applications found.</p>`;
+      }
+    }
+
+    // ── HISTORY ──
+    function loadHistory() {
+      const txns = viewTransactionHistory();
+      const box = document.getElementById('historyBox');
+      if (txns.length === 0) {
+        box.innerHTML = `<p class="empty-msg">No transactions yet.</p>`; return;
+      }
+      box.innerHTML = txns.reverse().map(t => {
+        const isSender = t.receiver_name === 'CASH DEPOSIT' ? false : t.sender_id === getLoggedInMember().id;
+        const isDeposit = t.receiver_name === 'CASH DEPOSIT';
+        const isWithdraw = t.receiver_name === 'CASH WITHDRAWAL';
+        const sign = isDeposit ? '+' : (isWithdraw || isSender) ? '-' : '+';
+        const color = sign === '+' ? 'green' : 'red';
+        const label = isDeposit ? 'Cash Deposit' : isWithdraw ? 'Cash Withdrawal' : isSender ? `To: ${t.receiver_name}` : `From: ${t.sender_name}`;
+        return `<div class="txn-card">
+          <div>
+            <p class="txn-label">${label}</p>
+          </div>
+          <p class="txn-amount ${color}">${sign}₹${t.amount.toLocaleString()}</p>
+        </div>`;
+      }).join('');
+    }
+
+    // ── PASSWORD ──
+    function handlePasswordChange() {
+      const current = document.getElementById('currentPass').value;
+      const newP = document.getElementById('newPass').value;
+      const confirm = document.getElementById('confirmPass').value;
+      const msg = document.getElementById('passMsg');
+      if (!current || !newP || !confirm) { showMsg(msg, 'Please fill all fields!', false); return; }
+      const result = changePassword(current, newP, confirm);
+      if (result.success) {
+        showMsg(msg, 'Password changed successfully!', true);
+        document.getElementById('currentPass').value = '';
+        document.getElementById('newPass').value = '';
+        document.getElementById('confirmPass').value = '';
+      } else {
+        showMsg(msg, result.msg, false);
+      }
+    }
+
+    function showMsg(el, text, success) {
+      el.textContent = text;
+      el.style.color = success ? '#4ade80' : '#f87171';
+    }
+
+    function logout() {
+  sessionStorage.removeItem('loggedInMember'); // only remove login, keep data
+  window.location.href = 'front_page.html';
+    }
+  </script>
+
+</body>
+</html>
