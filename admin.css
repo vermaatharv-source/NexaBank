@@ -250,3 +250,85 @@ tr:hover td { background: #141414; }
   transition: background 0.2s;
 }
 .btn-reject:hover { background: rgba(239,68,68,0.2); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  body {
+    flex-direction: column;
+  }
+  .sidebar {
+    position: static;
+    width: 100%;
+    min-height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 16px;
+    gap: 8px;
+  }
+  .brand, .admin-badge, .admin-name {
+    flex: 0 0 auto;
+  }
+  nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    order: 3;
+  }
+  .nav-btn {
+    flex: 1 1 auto;
+    text-align: center;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .logout-btn {
+    order: 2;
+    margin-left: auto;
+  }
+  .main {
+    margin-left: 0;
+    padding: 20px;
+  }
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .card {
+    padding: 16px 14px;
+  }
+  .card h3 {
+    font-size: 24px;
+  }
+  .form-box {
+    padding: 20px;
+    max-width: 100%;
+  }
+  .nav-btn {
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+  .table-wrap {
+    overflow-x: auto;
+  }
+  table {
+    min-width: 480px;
+  }
+  .loan-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .loan-actions {
+    width: 100%;
+  }
+  .btn-approve, .btn-reject {
+    flex: 1;
+    text-align: center;
+  }
+}

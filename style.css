@@ -233,3 +233,48 @@ body {
   color: #2a2a2a;
   text-align: center;
 }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  body {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+  .left-panel, .right-panel {
+    width: 100%;
+  }
+  .left-panel {
+    padding: 32px 24px;
+  }
+  .left-content {
+    margin-bottom: 32px;
+  }
+  .left-content h1 {
+    font-size: 32px;
+  }
+  .stats {
+    gap: 28px;
+  }
+  .right-panel {
+    padding: 32px 24px;
+  }
+}
+
+@media (max-width: 420px) {
+  .left-content h1 {
+    font-size: 26px;
+  }
+  .left-content p {
+    max-width: 100%;
+  }
+  .stats {
+    gap: 20px;
+  }
+  .stat h3 {
+    font-size: 22px;
+  }
+  .login-box h2 {
+    font-size: 22px;
+  }
+}
